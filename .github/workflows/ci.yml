@@ -1,0 +1,62 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-18.04
+    env:
+      php_version: '7.4'
+      key: api-extensions-v1 # can be any string, change to clear the extension cache.
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Extension Cache Environment
+      id: extcache
+      uses: shivammathur/cache-extensions@v1
+      with:
+        php-version: ${{ env.php_version }}
+        extensions: ${{ env.extensions }}
+        key: ${{ env.key }}
+    - name: Cache extensions
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.extcache.outputs.dir }}
+        key: ${{ steps.extcache.outputs.key }}
+        restore-keys: ${{ steps.extcache.outputs.key }}
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.php_version }}
+        extensions: ${{ env.extensions }}
+        ini-values: log_errors=1
+        coverage: none
+    - name: Uninstall HHVM
+      run: sudo apt remove hhvm
+    - name: Get composer cache directory
+      id: composercache
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.composercache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+    - name: Install dependencies
+      run: composer install --no-interaction
+    - name: PHPUnit
+      if: ${{ always() }}
+      run: vendor/bin/phpunit tests
+    - name: PHP CS Fixer
+      if: ${{ always() }}
+      run: vendor/bin/php-cs-fixer fix . --show-progress=dots --using-cache=no --dry-run --rules=@Symfony --verbose
+    - name: PHPStan
+      if: ${{ always() }}
+      run: vendor/bin/phpstan analyse --error-format=github --no-ansi --no-progress --no-interaction

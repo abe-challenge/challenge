@@ -1,0 +1,12 @@
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+	level: max
+	paths:
+		- public
+		- src
+		- tests
+	parallel:
+	    processTimeout: 180.0
+	inferPrivatePropertyTypeFromConstructor: true

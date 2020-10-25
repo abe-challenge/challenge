@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - "./docker/entrypoint.sh:/entrypoint.sh"
+      - ".:/www/challenge"
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/Dockerfile
+  #   volumes:
+  #     - "./:/www/challenge"
+  #   restart: unless-stopped
+  #   entrypoint:
+  #     - php
+  #     - bin/console
+  #     - messenger:consume
+  #     - high_prio_redis
+  #     - default_prio_redis
+  #     - transcoding_redis
+  #     - low_prio_redis
+  #     - -vv
+
+  db:
+    image: mysql:${MYSQL_VERSION}
+    restart: unless-stopped
+    volumes:
+      - "sql:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - ${ADMINER_PORT}:8080
+
+volumes:
+  sql:

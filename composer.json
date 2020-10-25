@@ -1,0 +1,17 @@
+{
+    "name": "root/challenge",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "slim/slim": "^4.5",
+        "slim/psr7": "^1.2",
+        "php-di/php-di": "^6.3",
+        "doctrine/orm": "^2.7"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.52",
+        "phpunit/phpunit": "^9.4",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpstan/phpstan-strict-rules": "^0.12.5"
+    }
+}
