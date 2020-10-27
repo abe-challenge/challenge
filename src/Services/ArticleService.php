@@ -64,6 +64,20 @@ class ArticleService
         }
     }
 
+    public function updateArticle(int $articleId, array $data): string
+    {
+        $articleDto = $this->getArticle($articleId);
+        if ($articleDto === null) {
+            throw new ArticleNotFoundException();
+        }
+
+        if (!empty($data['name']) || !empty($data['stock'])) {
+            $this->articleRepository->update($articleId, $data['name'] ?? $articleDto->name, $data['stock'] ?? $articleDto->stock);
+        }
+
+        return $this->getArticleAsEncoded($articleId);
+    }
+
     public function deleteArticle(int $articleId): void
     {
         if (!$this->hasArticleId($articleId)) {
@@ -92,6 +106,6 @@ class ArticleService
 
     private function hasArticleId(int $articleId): bool
     {
-        return !empty($this->articleRepository->get($articleId)->fetch())
+        return !empty($this->articleRepository->get($articleId)->fetch());
     }
 }

@@ -13,6 +13,18 @@ class ArticleRepository extends BaseRepository
         );
     }
 
+    public function insert(int $articleId, string $name, int $stock): void
+    {
+        $preparedStatement = $this->databaseConnection->prepare(
+            'INSERT INTO `articles` VALUES (:articleId, :name, :stock)'
+        );
+        $preparedStatement->execute([
+            'articleId' => $articleId,
+            'name' => $name,
+            'stock' => $stock,
+        ]);
+    }
+
     public function get(int $articleId): PDOStatement
     {
         $preparedStatement = $this->databaseConnection->prepare(
@@ -22,10 +34,10 @@ class ArticleRepository extends BaseRepository
         return $preparedStatement;
     }
 
-    public function insert(int $articleId, string $name, int $stock): void
+    public function update(int $articleId, string $name, int $stock)
     {
         $preparedStatement = $this->databaseConnection->prepare(
-            'INSERT INTO `articles` VALUES (:articleId, :name, :stock)'
+            'UPDATE `articles` SET `name` = :name, `stock` = :stock WHERE `id` = :articleId'
         );
         $preparedStatement->execute([
             'articleId' => $articleId,

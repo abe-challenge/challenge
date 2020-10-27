@@ -57,9 +57,16 @@ class ArticleController
         return $response;
     }
 
-    public function updateArticle(Response $response, $id)
+    public function updateArticle(Request $request, Response $response, $id)
     {
-        $response->getBody()->write($id);
+        $updateData = $request->getParsedBody();
+        try {
+            $response->getBody()->write($this->articleService->updateArticle((int) $id, $updateData));
+        } catch (ArticleNotFoundException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(404);
+        }
+
         return $response;
     }
 
