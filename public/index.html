@@ -42,8 +42,7 @@
 
     var buyProduct = (productId) => {
         fetch(`/api/products/${productId}/sell`, { method: 'POST' })
-        .then(response => response.json())
-        .then(response => console.log(response))
+        .then(response => location.reload())
         .catch(error => console.error(error))
     }
     window.onload = () => getProducts()
