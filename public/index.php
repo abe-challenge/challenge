@@ -39,6 +39,7 @@ $app->group('/api', function (RouteCollectorProxy $routeCollectorProxy) {
     });
 });
 
+// TODO: Uncomment below
 // $routeCollector = $app->getRouteCollector();
 // $routeCollector->setCacheFile(sys_get_temp_dir() . '/routecache');
 
