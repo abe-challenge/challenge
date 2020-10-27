@@ -28,16 +28,6 @@ class ArticleService
         return json_encode($this->getAllArticles()) ?? null;
     }
 
-    public function getArticleAsEncoded(int $articleId): string
-    {
-        $articleDto = $this->getArticle($articleId);
-        if ($articleDto === null) {
-            throw new ArticleNotFoundException();
-        }
-
-        return json_encode($this->getArticle($articleId)) ?? null;
-    }
-
     public function addArticlesFromUploadedFiles(array $uploadedFiles): void
     {
         if (empty($uploadedFiles) || empty($uploadedFiles['article_file'])) {
@@ -58,6 +48,16 @@ class ArticleService
                 (int) $decodedArticle->stock
             );
         }
+    }
+
+    public function getArticleAsEncoded(int $articleId): string
+    {
+        $articleDto = $this->getArticle($articleId);
+        if ($articleDto === null) {
+            throw new ArticleNotFoundException();
+        }
+
+        return json_encode($articleDto);
     }
 
     public function updateArticle(int $articleId, array $data): string

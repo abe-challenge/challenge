@@ -4,6 +4,8 @@ namespace ABE\Controllers;
 
 use ABE\Exceptions\EmptyFileException;
 use ABE\Exceptions\MalformedUploadException;
+use ABE\Exceptions\NoStockException;
+use ABE\Exceptions\ProductNotFoundException;
 use ABE\Services\ProductService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -43,30 +45,62 @@ class ProductController
             return $response->withStatus(400);
         }
 
-        return $response->withStatus(201);
+        return $response->withStatus(302)->withHeader('Location', '/');
     }
 
-    public function getProduct(Response $response, $id)
+    public function getProduct(Response $response, string $productId)
     {
-        $response->getBody()->write($id);
+        try {
+            $response->getBody()->write($this->productService->getProductAsEncoded($productId));
+        } catch (ProductNotFoundException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(404);
+        }
+
         return $response;
     }
 
-    public function updateProduct(Response $response, $id)
+    public function updateProduct(Request $request, Response $response, string $productId)
     {
-        $response->getBody()->write($id);
+        try {
+            $response->getBody()->write(
+                $this->productService->updateProduct(
+                    $productId,
+                    $request->getParsedBody()
+                )
+            );
+        } catch (ProductNotFoundException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(404);
+        }
+
         return $response;
     }
 
-    public function sellProduct(Response $response, $id)
+    public function deleteProduct(Response $response, string $productId)
     {
-        $response->getBody()->write($id);
-        return $response;
+        try {
+            $this->productService->deleteProduct($productId);
+        } catch (ProductNotFoundException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(404);
+        }
+
+        return $response->withStatus(204);
     }
 
-    public function deleteProduct(Response $response, $id)
+    public function sellProduct(Response $response, string $productId)
     {
-        $response->getBody()->write($id);
-        return $response;
+        try {
+            $this->productService->sellProduct($productId);
+        } catch (ProductNotFoundException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(404);
+        } catch (NoStockException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(400);
+        }
+
+        return $response->withStatus(204);
     }
 }

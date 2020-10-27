@@ -19,7 +19,7 @@ $app->group('/api', function (RouteCollectorProxy $routeCollectorProxy) {
         $articlesCollector->get('', [ArticleController::class, 'getAllArticles']);
         $articlesCollector->post('', [ArticleController::class, 'addArticles']);
 
-        $articlesCollector->group('/{id:[0-9]+}', function (RouteCollectorProxy $articleCollector) {
+        $articlesCollector->group('/{articleId:[0-9]+}', function (RouteCollectorProxy $articleCollector) {
             $articleCollector->get('', [ArticleController::class, 'getArticle']);
             $articleCollector->post('', [ArticleController::class, 'updateArticle']);
             $articleCollector->delete('', [ArticleController::class, 'deleteArticle']);
@@ -30,7 +30,7 @@ $app->group('/api', function (RouteCollectorProxy $routeCollectorProxy) {
         $productsCollector->get('', [ProductController::class, 'getAllProducts']);
         $productsCollector->post('', [ProductController::class, 'addProducts']);
 
-        $productsCollector->group('/{id:[0-9]+}', function (RouteCollectorProxy $productCollector) {
+        $productsCollector->group('/{productId:[0-9a-z]+}', function (RouteCollectorProxy $productCollector) {
             $productCollector->get('', [ProductController::class, 'getProduct']);
             $productCollector->post('', [ProductController::class, 'updateProduct']);
             $productCollector->delete('', [ProductController::class, 'deleteProduct']);
@@ -39,8 +39,8 @@ $app->group('/api', function (RouteCollectorProxy $routeCollectorProxy) {
     });
 });
 
-$routeCollector = $app->getRouteCollector();
-$routeCollector->setCacheFile(sys_get_temp_dir() . '/routecache');
+// $routeCollector = $app->getRouteCollector();
+// $routeCollector->setCacheFile(sys_get_temp_dir() . '/routecache');
 
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();

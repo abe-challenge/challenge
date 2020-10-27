@@ -2,22 +2,96 @@
 <html>
 <head>
     <title>ABE Challenge</title>
-    <script src="./main.js"></script>
-    <script>
-        window.onload = () => getProducts()
-    </script>
+    <script>var getProducts = () => {
+        fetch('/api/products')
+        .then(response => response.json())
+        .then(response => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('products').style.display = 'block';
+            const productsTable = document.getElementById('productsTable');
+            response.forEach(product => {
+                const row = document.createElement('tr');
+                const dataId = document.createElement('td');
+                dataId.innerHTML = product.id
+                const dataName = document.createElement('td');
+                dataName.innerHTML = product.name
+                const dataPrice = document.createElement('td');
+                dataPrice.innerHTML = product.price
+                const dataStock = document.createElement('td');
+                dataStock.innerHTML = product.stock ?? 'N/A'
+                const dataBuy = document.createElement('td');
+                const buyButton = document.createElement('button');
+                buyButton.onclick = () => this.buyProduct(product.id);
+                buyButton.innerHTML = 'Buy'
+
+                if (!product.stock || product.stock < 1) {
+                    buyButton.disabled = true
+                }
+                dataBuy.appendChild(buyButton);
+
+                row.appendChild(dataId);
+                row.appendChild(dataName);
+                row.appendChild(dataPrice);
+                row.appendChild(dataStock);
+                row.appendChild(dataBuy);
+                productsTable.appendChild(row)
+            });
+        })
+        .catch(error => console.error(error))
+    }
+
+    var buyProduct = (productId) => {
+        fetch(`/api/products/${productId}/sell`, { method: 'POST' })
+        .then(response => response.json())
+        .then(response => console.log(response))
+        .catch(error => console.error(error))
+    }
+    window.onload = () => getProducts()
+</script>
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+</head>
 <body>
+    <h1>Products</h1>
     <p id="loading">Loading!</p>
-    <div id="products"></div>
+    <div id="products" style="display: none;">
+        <table id="productsTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Buy</th>
+            </tr>
+        </table>
+    </div>
     <hr class="dotted">
     <div id="loader">
         <div id="product">
+            <h2>Load product</h2>
             <form method="post" enctype="multipart/form-data" action="/api/products">
                 <input type="file" id="product_file" name="product_file">
                 <input type="submit">
             </form>
         </div>
+        <hr class="dotted">
         <div id="article">
+            <h2>Load article</h2>
             <form method="post" enctype="multipart/form-data" action="/api/articles">
                 <input type="file" id="article_file" name="article_file">
                 <input type="submit">

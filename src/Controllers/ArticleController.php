@@ -42,13 +42,13 @@ class ArticleController
             return $response->withStatus(400);
         }
 
-        return $response->withStatus(201);
+        return $response->withStatus(302)->withHeader('Location', '/');
     }
 
-    public function getArticle(Response $response, $id)
+    public function getArticle(Response $response, string $articleId)
     {
         try {
-            $response->getBody()->write($this->articleService->getArticleAsEncoded((int) $id));
+            $response->getBody()->write($this->articleService->getArticleAsEncoded((int) $articleId));
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
             return $response->withStatus(404);
@@ -57,11 +57,15 @@ class ArticleController
         return $response;
     }
 
-    public function updateArticle(Request $request, Response $response, $id)
+    public function updateArticle(Request $request, Response $response, string $articleId)
     {
-        $updateData = $request->getParsedBody();
         try {
-            $response->getBody()->write($this->articleService->updateArticle((int) $id, $updateData));
+            $response->getBody()->write(
+                $this->articleService->updateArticle(
+                    (int) $articleId,
+                    $request->getParsedBody()
+                )
+            );
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
             return $response->withStatus(404);
@@ -70,10 +74,10 @@ class ArticleController
         return $response;
     }
 
-    public function deleteArticle(Response $response, $id)
+    public function deleteArticle(Response $response, string $articleId)
     {
         try {
-            $this->articleService->deleteArticle((int) $id);
+            $this->articleService->deleteArticle((int) $articleId);
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
             return $response->withStatus(404);

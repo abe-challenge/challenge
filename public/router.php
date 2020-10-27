@@ -1,10 +1,6 @@
 <?php
 
-$requestPath = $_SERVER["REQUEST_URI"];
-if (preg_match('/\.(?:js|html)$/', $requestPath)) {
-    return false;
-} elseif (strpos($requestPath, "/api/") !== 0) {
-    // Unknown route, serve index
+if (strpos($_SERVER["REQUEST_URI"], "/api/") !== 0) {
     readfile(__DIR__ . "/index.html");
     exit;
 }
