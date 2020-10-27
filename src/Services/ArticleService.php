@@ -8,22 +8,18 @@ use ABE\Exceptions\ArticleNotFoundException;
 use ABE\Exceptions\EmptyFileException;
 use ABE\Exceptions\MalformedUploadException;
 use ABE\Repositories\ArticleRepository;
-use ABE\Validators\ArticleValidator;
 use Symfony\Component\Messenger\MessageBus;
 
 class ArticleService
 {
     private $articleRepository;
-    private $articleValidator;
     private $messageBus;
 
     public function __construct(
         ArticleRepository $articleRepository,
-        ArticleValidator $articleValidator,
         MessageBus $messageBus
     ) {
         $this->articleRepository = $articleRepository;
-        $this->articleValidator = $articleValidator;
         $this->messageBus = $messageBus;
     }
 
