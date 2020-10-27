@@ -4,12 +4,20 @@
     "license": "MIT",
     "require": {
         "slim/slim": "^4.5",
-        "slim/psr7": "^1.2"
+        "slim/psr7": "^1.2",
+        "php-di/slim-bridge": "^3.0",
+        "symfony/messenger": "^5.1"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.52",
         "phpunit/phpunit": "^9.4",
         "friendsofphp/php-cs-fixer": "^2.16",
         "phpstan/phpstan-strict-rules": "^0.12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "ABE\\": "src/",
+            "ABE\\Tests\\": "tests/"
+        }
     }
 }

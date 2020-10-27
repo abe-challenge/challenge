@@ -1,24 +1,54 @@
 <?php
 
-$requestPath = $_SERVER["REQUEST_URI"];
-if (preg_match('/\.(?:js|html)$/', $requestPath)) {
-    return false;    // serve the requested resource as-is.
-} elseif (strpos($requestPath, "/api/") !== 0) {
-    readfile(__DIR__ . "/index.html");
-    exit;
-}
+use ABE\Controllers\ArticleController;
+use ABE\Controllers\ProductController;
+use DI\Bridge\Slim\Bridge;
+use DI\ContainerBuilder;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Routing\RouteCollectorProxy;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Slim\Factory\AppFactory;
+$containerBuilder = new ContainerBuilder();
+// TODO: Uncomment below
+// $containerBuilder->enableCompilation(sys_get_temp_dir());
+// $containerBuilder->writeProxiesToFile(true, sys_get_temp_dir());
+// $containerBuilder->useAnnotations(false);
+$app = Bridge::create($containerBuilder->build());
 
-require __DIR__ . '/../vendor/autoload.php';
+$app->group('/api', function (RouteCollectorProxy $routeCollectorProxy) {
+    $routeCollectorProxy->group('/articles', function (RouteCollectorProxy $articlesCollector) {
+        $articlesCollector->get('', [ArticleController::class, 'getAllArticles']);
+        $articlesCollector->post('', [ArticleController::class, 'addArticles']);
 
-$app = AppFactory::create();
+        $articlesCollector->group('/{id:[0-9]+}', function (RouteCollectorProxy $articleCollector) {
+            $articleCollector->get('', [ArticleController::class, 'getArticle']);
+            $articleCollector->post('', [ArticleController::class, 'updateArticle']);
+            $articleCollector->delete('', [ArticleController::class, 'deleteArticle']);
+        });
+    });
 
-$app->get('/api/products', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    $response->getBody()->write("Hello world!");
-    return $response;
+    $routeCollectorProxy->group('/products', function (RouteCollectorProxy $productsCollector) {
+        $productsCollector->get('', [ProductController::class, 'getAllProducts']);
+        $productsCollector->post('', [ProductController::class, 'addProducts']);
+
+        $productsCollector->group('/{id:[0-9]+}', function (RouteCollectorProxy $productCollector) {
+            $productCollector->get('', [ProductController::class, 'getProduct']);
+            $productCollector->post('', [ProductController::class, 'updateProduct']);
+            $productCollector->delete('', [ProductController::class, 'deleteProduct']);
+            $productCollector->post('/sell', [ProductController::class, 'sellProduct']);
+        });
+    });
 });
 
-$app->run();
+$routeCollector = $app->getRouteCollector();
+$routeCollector->setCacheFile(sys_get_temp_dir() . '/routecache');
+
+$app->addBodyParsingMiddleware();
+$app->addRoutingMiddleware();
+// TODO: remove below
+$app->addErrorMiddleware(true, false, false);
+
+try {
+    $app->run();
+} catch (HttpNotFoundException $e) {
+    http_response_code(404);
+}

@@ -6,20 +6,20 @@
     <script>
         window.onload = () => getProducts()
     </script>
-f<body>
-    <p>Loading!</p>
+<body>
+    <p id="loading">Loading!</p>
     <div id="products"></div>
-    <hr class="dotted" style="display:none;">
+    <hr class="dotted">
     <div id="loader">
         <div id="product">
-            <form action="/action_page.php">
-                <input type="file" id="product_file" name="filename">
+            <form method="post" enctype="multipart/form-data" action="/api/products">
+                <input type="file" id="product_file" name="product_file">
                 <input type="submit">
             </form>
         </div>
         <div id="article">
-            <form action="/action_page.php">
-                <input type="file" id="article_file" name="filename">
+            <form method="post" enctype="multipart/form-data" action="/api/articles">
+                <input type="file" id="article_file" name="article_file">
                 <input type="submit">
             </form>
         </div>
