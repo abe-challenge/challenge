@@ -64,6 +64,15 @@ class ArticleService
         }
     }
 
+    public function deleteArticle(int $articleId): void
+    {
+        if (!$this->hasArticleId($articleId)) {
+            throw new ArticleNotFoundException();
+        }
+
+        $this->articleRepository->delete($articleId);
+    }
+
     private function getArticle(int $articleId): ?ArticleDto
     {
         return ArticleDtoAssembler::assembleFromStatement(
@@ -79,5 +88,10 @@ class ArticleService
         return ArticleDtoAssembler::assembleMultipleFromStatement(
             $this->articleRepository->getAll()
         );
+    }
+
+    private function hasArticleId(int $articleId): bool
+    {
+        return !empty($this->articleRepository->get($articleId)->fetch())
     }
 }

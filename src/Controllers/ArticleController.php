@@ -65,7 +65,13 @@ class ArticleController
 
     public function deleteArticle(Response $response, $id)
     {
-        $response->getBody()->write($id);
-        return $response;
+        try {
+            $this->articleService->deleteArticle((int) $id);
+        } catch (ArticleNotFoundException $e) {
+            $response->getBody()->write($e->getMessage());
+            return $response->withStatus(404);
+        }
+
+        return $response->withStatus(204);
     }
 }

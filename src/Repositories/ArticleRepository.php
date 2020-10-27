@@ -33,4 +33,12 @@ class ArticleRepository extends BaseRepository
             'stock' => $stock,
         ]);
     }
+
+    public function delete(int $articleId): void
+    {
+        $preparedStatement = $this->databaseConnection->prepare(
+            'DELETE FROM `articles` WHERE `id` = :articleId LIMIT 1'
+        );
+        $preparedStatement->execute(['articleId' => $articleId]);
+    }
 }
