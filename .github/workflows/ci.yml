@@ -37,7 +37,7 @@ jobs:
       run: vendor/bin/phpunit tests
     - name: PHP CS Fixer
       if: ${{ always() }}
-      run: vendor/bin/php-cs-fixer fix . --show-progress=dots --using-cache=no --dry-run --rules=@Symfony --verbose
+      run: vendor/bin/php-cs-fixer fix . --show-progress=dots --using-cache=no --dry-run --rules=@Symfony,-yoda_style --verbose
     - name: PHPStan
       if: ${{ always() }}
       run: vendor/bin/phpstan analyse --error-format=github --no-ansi --no-progress --no-interaction

@@ -9,8 +9,6 @@ use ABE\Exceptions\ProductNotFoundException;
 use ABE\Services\ProductService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\UploadedFileInterface;
-use RuntimeException;
 
 class ProductController
 {
@@ -26,10 +24,12 @@ class ProductController
         $encodedProducts = $this->productService->getAllProductsAsEncoded();
         if ($encodedProducts === null) {
             $response->getBody()->write('Unable to get all products');
+
             return $response->withStatus(500);
         }
 
         $response->getBody()->write($encodedProducts);
+
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
@@ -39,9 +39,11 @@ class ProductController
             $this->productService->addProductsFromUploadedFiles($request->getUploadedFiles());
         } catch (EmptyFileException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(400);
         } catch (MalformedUploadException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(400);
         }
 
@@ -54,6 +56,7 @@ class ProductController
             $response->getBody()->write($this->productService->getProductAsEncoded($productId));
         } catch (ProductNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         }
 
@@ -71,6 +74,7 @@ class ProductController
             );
         } catch (ProductNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         }
 
@@ -83,6 +87,7 @@ class ProductController
             $this->productService->deleteProduct($productId);
         } catch (ProductNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         }
 
@@ -95,9 +100,11 @@ class ProductController
             $this->productService->sellProduct($productId);
         } catch (ProductNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         } catch (NoStockException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(400);
         }
 

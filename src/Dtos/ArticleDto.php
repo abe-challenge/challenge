@@ -10,8 +10,8 @@ class ArticleDto
 
     public function __construct(int $id, string $name, int $stock)
     {
-        $this->id = $id;   
-        $this->name = $name;   
-        $this->stock = $stock;   
+        $this->id = $id;
+        $this->name = $name;
+        $this->stock = $stock;
     }
 }

@@ -6,7 +6,6 @@ parameters:
 	paths:
 		- public
 		- src
-		- tests
 	parallel:
 	    processTimeout: 180.0
 	inferPrivatePropertyTypeFromConstructor: true

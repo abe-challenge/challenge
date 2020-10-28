@@ -3,7 +3,6 @@
 namespace ABE;
 
 use PDO;
-use PDOException;
 
 class Database
 {

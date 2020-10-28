@@ -21,6 +21,7 @@ class ProductDtoAssembler
                 $product['stock']
             );
         }
+
         return $productDtos;
     }
 

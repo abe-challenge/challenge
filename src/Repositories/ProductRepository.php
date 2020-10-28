@@ -31,6 +31,7 @@ class ProductRepository extends BaseRepository
             'SELECT `id`, `name`, `price`, `stock`.`stock` FROM `products` inner join `stock` on `stock`.`product_id` = `products`.`id` WHERE `products`.`id` = :productId'
         );
         $preparedStatement->execute(['productId' => $productId]);
+
         return $preparedStatement;
     }
 

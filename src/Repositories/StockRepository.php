@@ -11,7 +11,7 @@ class StockRepository extends BaseRepository
         );
         $preparedStatement->execute([
             'productId' => $productId,
-            'stock' => $stock
+            'stock' => $stock,
         ]);
     }
 
@@ -36,7 +36,7 @@ class StockRepository extends BaseRepository
     public function set(string $productId, int $stock = 0)
     {
         $this->databaseConnection->beginTransaction();
-        $sql = "UPDATE `stock` SET `stock` = :stock WHERE product_id = :productId";
+        $sql = 'UPDATE `stock` SET `stock` = :stock WHERE product_id = :productId';
         $preparedStatement = $this->databaseConnection->prepare($sql);
         $preparedStatement->execute([
             'productId' => $productId,

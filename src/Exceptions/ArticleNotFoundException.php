@@ -8,6 +8,6 @@ class ArticleNotFoundException extends Exception
 {
     public function __construct()
     {
-        parent::__construct("Article not found");
+        parent::__construct('Article not found');
     }
 }

@@ -8,6 +8,6 @@ class MalformedUploadException extends Exception
 {
     public function __construct()
     {
-        parent::__construct("Uploaded file is malformed");
+        parent::__construct('Uploaded file is malformed');
     }
 }

@@ -8,6 +8,6 @@ class NoStockException extends Exception
 {
     public function __construct()
     {
-        parent::__construct("No stock left for product");
+        parent::__construct('No stock left for product');
     }
 }

@@ -23,10 +23,12 @@ class ArticleController
         $encodedArticles = $this->articleService->getAllArticlesAsEncoded();
         if ($encodedArticles === null) {
             $response->getBody()->write('Unable to get all articles');
+
             return $response->withStatus(500);
         }
 
         $response->getBody()->write($encodedArticles);
+
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
@@ -36,9 +38,11 @@ class ArticleController
             $this->articleService->addArticlesFromUploadedFiles($request->getUploadedFiles());
         } catch (EmptyFileException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(400);
         } catch (MalformedUploadException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(400);
         }
 
@@ -51,6 +55,7 @@ class ArticleController
             $response->getBody()->write($this->articleService->getArticleAsEncoded((int) $articleId));
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         }
 
@@ -68,6 +73,7 @@ class ArticleController
             );
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         }
 
@@ -80,6 +86,7 @@ class ArticleController
             $this->articleService->deleteArticle((int) $articleId);
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
+
             return $response->withStatus(404);
         }
 

@@ -2,17 +2,9 @@
 
 namespace ABE\Services;
 
-use ABE\Dtos\ProductDto;
-use ABE\DtoAssemblers\ProductDtoAssembler;
-use ABE\Exceptions\EmptyFileException;
-use ABE\Exceptions\MalformedUploadException;
-use ABE\Exceptions\NoStockException;
-use ABE\Exceptions\ProductNotFoundException;
 use ABE\Repositories\ArticleRepository;
 use ABE\Repositories\ProductArticleMappingRepository;
-use ABE\Repositories\ProductRepository;
 use ABE\Repositories\StockRepository;
-use Symfony\Component\Messenger\MessageBus;
 
 class StockService
 {
@@ -85,7 +77,7 @@ class StockService
             }
 
             $amountOfAvailableProductsPerArticle[] = (int) floor(
-                $articleStockInformation['stock']/$amountInformationIndexedById[$articleStockInformation['id']]
+                $articleStockInformation['stock'] / $amountInformationIndexedById[$articleStockInformation['id']]
             );
         }
 

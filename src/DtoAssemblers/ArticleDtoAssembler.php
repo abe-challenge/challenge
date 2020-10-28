@@ -20,6 +20,7 @@ class ArticleDtoAssembler
                 $article['stock'],
             );
         }
+
         return $articleDtos;
     }
 

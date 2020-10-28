@@ -31,6 +31,7 @@ class ArticleRepository extends BaseRepository
             'SELECT `id`, `name`, `stock` FROM `articles` WHERE `id` = :articleId'
         );
         $preparedStatement->execute(['articleId' => $articleId]);
+
         return $preparedStatement;
     }
 
@@ -79,6 +80,7 @@ class ArticleRepository extends BaseRepository
             "SELECT `id`, `stock` FROM `articles` WHERE `id` IN ($prepareStatementForWhereIn)"
         );
         $preparedStatement->execute($articleIds);
+
         return $preparedStatement;
     }
 }

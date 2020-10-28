@@ -24,6 +24,7 @@ class ProductArticleMappingRepository extends BaseRepository
             'SELECT `article_id`, `amount_of` FROM `product_article_mapping` WHERE `product_id` = :productId'
         );
         $preparedStatement->execute(['productId' => $productId]);
+
         return $preparedStatement;
     }
 
@@ -33,6 +34,7 @@ class ProductArticleMappingRepository extends BaseRepository
             'SELECT `product_id` FROM `product_article_mapping` WHERE `article_id` = :articleId'
         );
         $preparedStatement->execute(['articleId' => $articleId]);
+
         return $preparedStatement;
     }
 }
