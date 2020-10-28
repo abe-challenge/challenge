@@ -30,26 +30,22 @@ class StockService
     public function decreaseProductStock(string $productId, int $decrement = 1): void
     {
         $dependentArticles = $this->productArticleMappingRepository->getRequiredArticlesForProduct($productId)->fetchAll();
-        if ($dependentArticles === false) {
-            return;
+        if (is_iterable($dependentArticles)) {
+            foreach ($dependentArticles as $dependentArticle) {
+                $this->decreaseArticleStock($dependentArticle['article_id'], $dependentArticle['amount_of']);
+            }
+        } else {
+            $this->stockRepository->decrease($productId, $decrement);
         }
-
-        foreach ($dependentArticles as $dependentArticle) {
-            $this->decreaseArticleStock($dependentArticle['article_id'], $dependentArticle['amount_of']);
-        }
-
-        $this->stockRepository->decrease($productId, $decrement);
     }
 
     public function calculateStockForArticleUpdate(int $articleId): void
     {
         $relatedProducts = $this->productArticleMappingRepository->getRelatedProductsForArticle($articleId)->fetchAll();
-        if ($relatedProducts === false) {
-            return;
-        }
-
-        foreach ($relatedProducts as $relatedProduct) {
-            $this->calculateProductStock($relatedProduct['product_id']);
+        if (is_iterable($relatedProducts)) {
+            foreach ($relatedProducts as $relatedProduct) {
+                $this->calculateProductStock($relatedProduct['product_id']);
+            }
         }
     }
 
