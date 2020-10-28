@@ -53,7 +53,11 @@ class ProductController
     public function getProduct(Response $response, string $productId): Response
     {
         try {
-            $response->getBody()->write($this->productService->getProductAsEncoded($productId));
+            $encodedProduct = $this->productService->getProductAsEncoded($productId);
+
+            if ($encodedProduct !== null) {
+                $response->getBody()->write($encodedProduct);
+            }
         } catch (ProductNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
 
@@ -66,12 +70,14 @@ class ProductController
     public function updateProduct(Request $request, Response $response, string $productId): Response
     {
         try {
-            $response->getBody()->write(
-                $this->productService->updateProduct(
-                    $productId,
-                    is_array($request->getParsedBody()) ? $request->getParsedBody() : []
-                )
+            $updatedProduct = $this->productService->updateProduct(
+                $productId,
+                is_array($request->getParsedBody()) ? $request->getParsedBody() : []
             );
+
+            if ($updatedProduct !== null) {
+                $response->getBody()->write($updatedProduct);
+            }
         } catch (ProductNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
 

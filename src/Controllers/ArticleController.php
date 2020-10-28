@@ -52,7 +52,11 @@ class ArticleController
     public function getArticle(Response $response, string $articleId): Response
     {
         try {
-            $response->getBody()->write($this->articleService->getArticleAsEncoded((int) $articleId));
+            $encodedArticle = $this->articleService->getArticleAsEncoded((int) $articleId);
+
+            if ($encodedArticle !== null) {
+                $response->getBody()->write($encodedArticle);
+            }
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
 
@@ -65,12 +69,14 @@ class ArticleController
     public function updateArticle(Request $request, Response $response, string $articleId): Response
     {
         try {
-            $response->getBody()->write(
-                $this->articleService->updateArticle(
-                    (int) $articleId,
-                    is_array($request->getParsedBody()) ? $request->getParsedBody() : []
-                )
+            $updatedArticle = $this->articleService->updateArticle(
+                (int) $articleId,
+                is_array($request->getParsedBody()) ? $request->getParsedBody() : []
             );
+
+            if ($updatedArticle !== null) {
+                $response->getBody()->write($updatedArticle);
+            }
         } catch (ArticleNotFoundException $e) {
             $response->getBody()->write($e->getMessage());
 

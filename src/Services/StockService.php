@@ -22,14 +22,18 @@ class StockService
         $this->articleRepository = $articleRepository;
     }
 
-    public function initializeProductStock(string $productId)
+    public function initializeProductStock(string $productId): void
     {
         $this->stockRepository->initializeProductStock($productId);
     }
 
-    public function decreaseProductStock(string $productId, int $decrement = 1)
+    public function decreaseProductStock(string $productId, int $decrement = 1): void
     {
         $dependentArticles = $this->productArticleMappingRepository->getRequiredArticlesForProduct($productId)->fetchAll();
+        if ($dependentArticles === false) {
+            return;
+        }
+
         foreach ($dependentArticles as $dependentArticle) {
             $this->decreaseArticleStock($dependentArticle['article_id'], $dependentArticle['amount_of']);
         }
@@ -37,17 +41,25 @@ class StockService
         $this->stockRepository->decrease($productId, $decrement);
     }
 
-    public function calculateStockForArticleUpdate(int $articleId)
+    public function calculateStockForArticleUpdate(int $articleId): void
     {
         $relatedProducts = $this->productArticleMappingRepository->getRelatedProductsForArticle($articleId)->fetchAll();
+        if ($relatedProducts === false) {
+            return;
+        }
+
         foreach ($relatedProducts as $relatedProduct) {
             $this->calculateProductStock($relatedProduct['product_id']);
         }
     }
 
-    public function calculateProductStock(string $productId)
+    public function calculateProductStock(string $productId): void
     {
         $requiredArticles = $this->productArticleMappingRepository->getRequiredArticlesForProduct($productId)->fetchAll();
+        if ($requiredArticles === false) {
+            return;
+        }
+
         $articleStockInformations = $this->articleRepository->getMultipleStockInformation(array_reduce(
             $requiredArticles,
             function ($accumulator, $dependentArticle) {
@@ -70,21 +82,26 @@ class StockService
 
         $amountOfAvailableProductsPerArticle = [];
         foreach ($articleStockInformations as $articleStockInformation) {
-            if ($amountInformationIndexedById[$articleStockInformation['id']] === 0) {
+            $articleId = $articleStockInformation['id'];
+            if ($amountInformationIndexedById[$articleId] === 0) {
                 $amountOfAvailableProductsPerArticle[] = 0;
 
                 continue;
             }
 
             $amountOfAvailableProductsPerArticle[] = (int) floor(
-                $articleStockInformation['stock'] / $amountInformationIndexedById[$articleStockInformation['id']]
+                $articleStockInformation['stock'] / $amountInformationIndexedById[$articleId]
             );
         }
 
-        $this->stockRepository->set($productId, min($amountOfAvailableProductsPerArticle));
+        $minimumProductStock = min($amountOfAvailableProductsPerArticle);
+        $this->stockRepository->set(
+            $productId,
+            is_int($minimumProductStock) ? $minimumProductStock : 0
+        );
     }
 
-    private function decreaseArticleStock(int $articleId, int $decrement = 1)
+    private function decreaseArticleStock(int $articleId, int $decrement = 1): void
     {
         $this->articleRepository->decreaseStock($articleId, $decrement);
         $this->calculateStockForArticleUpdate($articleId);

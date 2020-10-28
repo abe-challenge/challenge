@@ -8,9 +8,9 @@ class ArticleRepository extends BaseRepository
 {
     public function getAll(): ?PDOStatement
     {
-        return $this->databaseConnection->query(
-            'SELECT `id`, `name`, `stock` FROM `articles`'
-        ) ?? null;
+        $statement = $this->databaseConnection->query('SELECT `id`, `name`, `stock` FROM `articles`');
+
+        return $statement instanceof PDOStatement ? $statement : null;
     }
 
     public function insert(int $articleId, string $name, int $stock): void

@@ -32,9 +32,6 @@ jobs:
         restore-keys: ${{ runner.os }}-composer-
     - name: Install dependencies
       run: composer install --no-interaction
-    - name: PHPUnit
-      if: ${{ always() }}
-      run: vendor/bin/phpunit tests
     - name: PHP CS Fixer
       if: ${{ always() }}
       run: vendor/bin/php-cs-fixer fix . --show-progress=dots --using-cache=no --dry-run --rules=@Symfony,-yoda_style --verbose

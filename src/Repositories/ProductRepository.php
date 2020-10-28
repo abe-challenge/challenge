@@ -8,9 +8,11 @@ class ProductRepository extends BaseRepository
 {
     public function getAll(): ?PDOStatement
     {
-        return $this->databaseConnection->query(
+        $statement = $this->databaseConnection->query(
             'SELECT `id`, `name`, `price`, `stock`.`stock` FROM `products` inner join `stock` on `stock`.`product_id` = `products`.`id`'
-        ) ?? null;
+        );
+
+        return $statement instanceof PDOStatement ? $statement : null;
     }
 
     public function insert(string $productId, string $name, int $price): void

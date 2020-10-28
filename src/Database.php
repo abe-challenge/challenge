@@ -7,7 +7,7 @@ use PDO;
 class Database
 {
     /**
-     * @var PDO
+     * @var PDO|null
      */
     private static $connection;
 

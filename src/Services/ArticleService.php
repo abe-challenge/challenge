@@ -8,6 +8,7 @@ use ABE\Exceptions\ArticleNotFoundException;
 use ABE\Exceptions\EmptyFileException;
 use ABE\Exceptions\MalformedUploadException;
 use ABE\Repositories\ArticleRepository;
+use Psr\Http\Message\UploadedFileInterface;
 
 class ArticleService
 {
@@ -26,12 +27,18 @@ class ArticleService
     {
         $encodedArticles = json_encode($this->getAllArticles());
 
-        return $encodedArticles ? $encodedArticles : null;
+        return is_string($encodedArticles) ? $encodedArticles : null;
     }
 
+    /**
+     * @param UploadedFileInterface[] $uploadedFiles
+     */
     public function addArticlesFromUploadedFiles(array $uploadedFiles): void
     {
-        if (empty($uploadedFiles) || empty($uploadedFiles['article_file'])) {
+        if (
+            count($uploadedFiles) < 1 ||
+            !isset($uploadedFiles['article_file'])
+        ) {
             throw new EmptyFileException();
         }
 
@@ -40,7 +47,12 @@ class ArticleService
             throw new MalformedUploadException();
         }
 
-        $decodedArticles = json_decode($uploadedFile->getStream()->read($uploadedFile->getStream()->getSize()));
+        $fileSize = $uploadedFile->getStream()->getSize();
+        if ($fileSize === null) {
+            throw new MalformedUploadException();
+        }
+
+        $decodedArticles = json_decode($uploadedFile->getStream()->read($fileSize));
 
         foreach ($decodedArticles->inventory as $decodedArticle) {
             $articleId = (int) $decodedArticle->art_id;
@@ -54,25 +66,34 @@ class ArticleService
         }
     }
 
-    public function getArticleAsEncoded(int $articleId): string
+    public function getArticleAsEncoded(int $articleId): ?string
     {
         $articleDto = $this->getArticle($articleId);
         if ($articleDto === null) {
             throw new ArticleNotFoundException();
         }
 
-        return json_encode($articleDto);
+        $encodedArticle = json_encode($articleDto);
+
+        return is_string($encodedArticle) ? $encodedArticle : null;
     }
 
-    public function updateArticle(int $articleId, array $data): string
+    /**
+     * @param string[] $data
+     */
+    public function updateArticle(int $articleId, array $data): ?string
     {
         $articleDto = $this->getArticle($articleId);
         if ($articleDto === null) {
             throw new ArticleNotFoundException();
         }
 
-        if (!empty($data['name']) || !empty($data['stock'])) {
-            $this->articleRepository->update($articleId, $data['name'] ?? $articleDto->name, $data['stock'] ?? $articleDto->stock);
+        if (isset($data['name']) || isset($data['stock'])) {
+            $this->articleRepository->update(
+                $articleId,
+                $data['name'] ?? $articleDto->name,
+                isset($data['stock']) ? (int) $data['stock'] : $articleDto->stock
+            );
             $this->stockService->calculateStockForArticleUpdate($articleId);
         }
 
@@ -107,6 +128,6 @@ class ArticleService
 
     private function hasArticleId(int $articleId): bool
     {
-        return !empty($this->articleRepository->get($articleId)->fetch());
+        return count($this->articleRepository->get($articleId)->fetch()) > 0;
     }
 }

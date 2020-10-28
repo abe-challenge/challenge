@@ -10,35 +10,40 @@ use ABE\Exceptions\NoStockException;
 use ABE\Exceptions\ProductNotFoundException;
 use ABE\Repositories\ProductArticleMappingRepository;
 use ABE\Repositories\ProductRepository;
-use Symfony\Component\Messenger\MessageBus;
+use Psr\Http\Message\UploadedFileInterface;
 
 class ProductService
 {
     private $stockService;
     private $productRepository;
     private $productArticleMappingRepository;
-    private $messageBus;
 
     public function __construct(
         StockService $stockService,
         ProductRepository $productRepository,
-        ProductArticleMappingRepository $productArticleMappingRepository,
-        MessageBus $messageBus
+        ProductArticleMappingRepository $productArticleMappingRepository
     ) {
         $this->stockService = $stockService;
         $this->productRepository = $productRepository;
         $this->productArticleMappingRepository = $productArticleMappingRepository;
-        $this->messageBus = $messageBus;
     }
 
     public function getAllProductsAsEncoded(): ?string
     {
-        return json_encode($this->getAllProducts()) ?? null;
+        $encodedProducts = json_encode($this->getAllProducts());
+
+        return is_string($encodedProducts) ? $encodedProducts : null;
     }
 
+    /**
+     * @param UploadedFileInterface[] $uploadedFiles
+     */
     public function addProductsFromUploadedFiles(array $uploadedFiles): void
     {
-        if (empty($uploadedFiles) || empty($uploadedFiles['product_file'])) {
+        if (
+            count($uploadedFiles) < 1 ||
+            !isset($uploadedFiles['product_file'])
+        ) {
             throw new EmptyFileException();
         }
 
@@ -47,7 +52,12 @@ class ProductService
             throw new MalformedUploadException();
         }
 
-        $decodedProducts = json_decode($uploadedFile->getStream()->read($uploadedFile->getStream()->getSize()));
+        $fileSize = $uploadedFile->getStream()->getSize();
+        if ($fileSize === null) {
+            throw new MalformedUploadException();
+        }
+
+        $decodedProducts = json_decode($uploadedFile->getStream()->read($fileSize));
 
         foreach ($decodedProducts->products as $decodedProduct) {
             $productId = isset($decodedProduct->id) ? $decodedProduct->id : uniqid();
@@ -66,25 +76,34 @@ class ProductService
         }
     }
 
-    public function getProductAsEncoded(string $productId): string
+    public function getProductAsEncoded(string $productId): ?string
     {
         $productDto = $this->getProduct($productId);
         if ($productDto === null) {
             throw new ProductNotFoundException();
         }
 
-        return json_encode($productDto);
+        $encodedProduct = json_encode($productDto);
+
+        return is_string($encodedProduct) ? $encodedProduct : null;
     }
 
-    public function updateProduct(string $productId, array $data): string
+    /**
+     * @param string[] $data
+     */
+    public function updateProduct(string $productId, array $data): ?string
     {
         $productDto = $this->getProduct($productId);
         if ($productDto === null) {
             throw new ProductNotFoundException();
         }
 
-        if (!empty($data['name']) || !empty($data['price'])) {
-            $this->productRepository->update($productId, $data['name'] ?? $productDto->name, $data['price'] ?? $productDto->price);
+        if (isset($data['name']) || isset($data['price'])) {
+            $this->productRepository->update(
+                $productId,
+                $data['name'] ?? $productDto->name,
+                isset($data['price']) ? (int) $data['price'] : $productDto->price
+            );
             $this->stockService->calculateProductStock($productId);
         }
 
@@ -133,6 +152,6 @@ class ProductService
 
     private function hasProductId(string $productId): bool
     {
-        return !empty($this->productRepository->get($productId)->fetch());
+        return count($this->productRepository->get($productId)->fetch()) > 0;
     }
 }
