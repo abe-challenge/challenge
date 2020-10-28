@@ -14,23 +14,23 @@ $containerBuilder = new ContainerBuilder();
 // $containerBuilder->useAnnotations(false);
 $app = Bridge::create($containerBuilder->build());
 
-$app->group('/api', function (RouteCollectorProxy $routeCollectorProxy) {
-    $routeCollectorProxy->group('/articles', function (RouteCollectorProxy $articlesCollector) {
+$app->group('/api', function (RouteCollectorProxy $routeCollectorProxy): void {
+    $routeCollectorProxy->group('/articles', function (RouteCollectorProxy $articlesCollector): void {
         $articlesCollector->get('', [ArticleController::class, 'getAllArticles']);
         $articlesCollector->post('', [ArticleController::class, 'addArticles']);
 
-        $articlesCollector->group('/{articleId:[0-9]+}', function (RouteCollectorProxy $articleCollector) {
+        $articlesCollector->group('/{articleId:[0-9]+}', function (RouteCollectorProxy $articleCollector): void {
             $articleCollector->get('', [ArticleController::class, 'getArticle']);
             $articleCollector->post('', [ArticleController::class, 'updateArticle']);
             $articleCollector->delete('', [ArticleController::class, 'deleteArticle']);
         });
     });
 
-    $routeCollectorProxy->group('/products', function (RouteCollectorProxy $productsCollector) {
+    $routeCollectorProxy->group('/products', function (RouteCollectorProxy $productsCollector): void {
         $productsCollector->get('', [ProductController::class, 'getAllProducts']);
         $productsCollector->post('', [ProductController::class, 'addProducts']);
 
-        $productsCollector->group('/{productId:[0-9a-z]+}', function (RouteCollectorProxy $productCollector) {
+        $productsCollector->group('/{productId:[0-9a-z]+}', function (RouteCollectorProxy $productCollector): void {
             $productCollector->get('', [ProductController::class, 'getProduct']);
             $productCollector->post('', [ProductController::class, 'updateProduct']);
             $productCollector->delete('', [ProductController::class, 'deleteProduct']);

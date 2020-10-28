@@ -10,8 +10,12 @@ class ArticleDtoAssembler
     /**
      * @return ArticleDto[]
      */
-    public static function assembleMultipleFromStatement(PDOStatement $statement): array
+    public static function assembleMultipleFromStatement(?PDOStatement $statement): array
     {
+        if ($statement === null) {
+            return [];
+        }
+
         $articleDtos = [];
         foreach ($statement as $article) {
             $articleDtos[] = new ArticleDto(

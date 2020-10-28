@@ -6,11 +6,11 @@ use PDOStatement;
 
 class ArticleRepository extends BaseRepository
 {
-    public function getAll(): PDOStatement
+    public function getAll(): ?PDOStatement
     {
         return $this->databaseConnection->query(
             'SELECT `id`, `name`, `stock` FROM `articles`'
-        );
+        ) ?? null;
     }
 
     public function insert(int $articleId, string $name, int $stock): void
@@ -35,7 +35,7 @@ class ArticleRepository extends BaseRepository
         return $preparedStatement;
     }
 
-    public function update(int $articleId, string $name, int $stock)
+    public function update(int $articleId, string $name, int $stock): void
     {
         $preparedStatement = $this->databaseConnection->prepare(
             'UPDATE `articles` SET `name` = :name, `stock` = :stock WHERE `id` = :articleId'
@@ -55,7 +55,7 @@ class ArticleRepository extends BaseRepository
         $preparedStatement->execute(['articleId' => $articleId]);
     }
 
-    public function decreaseStock(int $articleId, int $decrement = 1)
+    public function decreaseStock(int $articleId, int $decrement = 1): void
     {
         $this->databaseConnection->beginTransaction();
         $sql = "UPDATE `articles` SET `stock` = `stock` - $decrement WHERE id = :articleId";
@@ -64,7 +64,7 @@ class ArticleRepository extends BaseRepository
         $this->databaseConnection->commit();
     }
 
-    public function increaseStock(int $articleId, int $increment = 1)
+    public function increaseStock(int $articleId, int $increment = 1): void
     {
         $this->databaseConnection->beginTransaction();
         $sql = "UPDATE `articles` SET `stock` = `stock` + $increment WHERE id = :articleId";
@@ -73,6 +73,9 @@ class ArticleRepository extends BaseRepository
         $this->databaseConnection->commit();
     }
 
+    /**
+     * @param int[] $articleIds
+     */
     public function getMultipleStockInformation(array $articleIds): PDOStatement
     {
         $prepareStatementForWhereIn = implode(',', array_fill(0, count($articleIds), '?'));

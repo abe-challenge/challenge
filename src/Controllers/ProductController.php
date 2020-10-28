@@ -19,7 +19,7 @@ class ProductController
         $this->productService = $productService;
     }
 
-    public function getAllProducts(Response $response)
+    public function getAllProducts(Response $response): Response
     {
         $encodedProducts = $this->productService->getAllProductsAsEncoded();
         if ($encodedProducts === null) {
@@ -33,7 +33,7 @@ class ProductController
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    public function addProducts(Request $request, Response $response)
+    public function addProducts(Request $request, Response $response): Response
     {
         try {
             $this->productService->addProductsFromUploadedFiles($request->getUploadedFiles());
@@ -50,7 +50,7 @@ class ProductController
         return $response->withStatus(302)->withHeader('Location', '/');
     }
 
-    public function getProduct(Response $response, string $productId)
+    public function getProduct(Response $response, string $productId): Response
     {
         try {
             $response->getBody()->write($this->productService->getProductAsEncoded($productId));
@@ -63,13 +63,13 @@ class ProductController
         return $response;
     }
 
-    public function updateProduct(Request $request, Response $response, string $productId)
+    public function updateProduct(Request $request, Response $response, string $productId): Response
     {
         try {
             $response->getBody()->write(
                 $this->productService->updateProduct(
                     $productId,
-                    $request->getParsedBody()
+                    is_array($request->getParsedBody()) ? $request->getParsedBody() : []
                 )
             );
         } catch (ProductNotFoundException $e) {
@@ -81,7 +81,7 @@ class ProductController
         return $response;
     }
 
-    public function deleteProduct(Response $response, string $productId)
+    public function deleteProduct(Response $response, string $productId): Response
     {
         try {
             $this->productService->deleteProduct($productId);
@@ -94,7 +94,7 @@ class ProductController
         return $response->withStatus(204);
     }
 
-    public function sellProduct(Response $response, string $productId)
+    public function sellProduct(Response $response, string $productId): Response
     {
         try {
             $this->productService->sellProduct($productId);

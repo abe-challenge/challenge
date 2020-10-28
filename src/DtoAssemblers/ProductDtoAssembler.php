@@ -10,8 +10,12 @@ class ProductDtoAssembler
     /**
      * @return ProductDto[]
      */
-    public static function assembleMultipleFromStatement(PDOStatement $statement): array
+    public static function assembleMultipleFromStatement(?PDOStatement $statement): array
     {
+        if ($statement === null) {
+            return [];
+        }
+
         $productDtos = [];
         foreach ($statement as $product) {
             $productDtos[] = new ProductDto(

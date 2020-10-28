@@ -15,7 +15,7 @@ class StockRepository extends BaseRepository
         ]);
     }
 
-    public function decrease(string $productId, int $decrement = 1)
+    public function decrease(string $productId, int $decrement = 1): void
     {
         $this->databaseConnection->beginTransaction();
         $sql = "UPDATE `stock` SET `stock` = `stock` - $decrement WHERE product_id = :productId";
@@ -24,7 +24,7 @@ class StockRepository extends BaseRepository
         $this->databaseConnection->commit();
     }
 
-    public function increase(string $productId, int $increment = 1)
+    public function increase(string $productId, int $increment = 1): void
     {
         $this->databaseConnection->beginTransaction();
         $sql = "UPDATE `stock` SET `stock` = `stock` + $increment WHERE product_id = :productId";
@@ -33,7 +33,7 @@ class StockRepository extends BaseRepository
         $this->databaseConnection->commit();
     }
 
-    public function set(string $productId, int $stock = 0)
+    public function set(string $productId, int $stock = 0): void
     {
         $this->databaseConnection->beginTransaction();
         $sql = 'UPDATE `stock` SET `stock` = :stock WHERE product_id = :productId';

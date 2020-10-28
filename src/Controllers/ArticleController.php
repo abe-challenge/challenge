@@ -18,7 +18,7 @@ class ArticleController
         $this->articleService = $articleService;
     }
 
-    public function getAllArticles(Response $response)
+    public function getAllArticles(Response $response): Response
     {
         $encodedArticles = $this->articleService->getAllArticlesAsEncoded();
         if ($encodedArticles === null) {
@@ -32,7 +32,7 @@ class ArticleController
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    public function addArticles(Request $request, Response $response)
+    public function addArticles(Request $request, Response $response): Response
     {
         try {
             $this->articleService->addArticlesFromUploadedFiles($request->getUploadedFiles());
@@ -49,7 +49,7 @@ class ArticleController
         return $response->withStatus(302)->withHeader('Location', '/');
     }
 
-    public function getArticle(Response $response, string $articleId)
+    public function getArticle(Response $response, string $articleId): Response
     {
         try {
             $response->getBody()->write($this->articleService->getArticleAsEncoded((int) $articleId));
@@ -62,13 +62,13 @@ class ArticleController
         return $response;
     }
 
-    public function updateArticle(Request $request, Response $response, string $articleId)
+    public function updateArticle(Request $request, Response $response, string $articleId): Response
     {
         try {
             $response->getBody()->write(
                 $this->articleService->updateArticle(
                     (int) $articleId,
-                    $request->getParsedBody()
+                    is_array($request->getParsedBody()) ? $request->getParsedBody() : []
                 )
             );
         } catch (ArticleNotFoundException $e) {
@@ -80,7 +80,7 @@ class ArticleController
         return $response;
     }
 
-    public function deleteArticle(Response $response, string $articleId)
+    public function deleteArticle(Response $response, string $articleId): Response
     {
         try {
             $this->articleService->deleteArticle((int) $articleId);

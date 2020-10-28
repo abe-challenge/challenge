@@ -8,27 +8,25 @@ use ABE\Exceptions\ArticleNotFoundException;
 use ABE\Exceptions\EmptyFileException;
 use ABE\Exceptions\MalformedUploadException;
 use ABE\Repositories\ArticleRepository;
-use Symfony\Component\Messenger\MessageBus;
 
 class ArticleService
 {
     private $stockService;
     private $articleRepository;
-    private $messageBus;
 
     public function __construct(
         StockService $stockService,
-        ArticleRepository $articleRepository,
-        MessageBus $messageBus
+        ArticleRepository $articleRepository
     ) {
         $this->stockService = $stockService;
         $this->articleRepository = $articleRepository;
-        $this->messageBus = $messageBus;
     }
 
     public function getAllArticlesAsEncoded(): ?string
     {
-        return json_encode($this->getAllArticles()) ?? null;
+        $encodedArticles = json_encode($this->getAllArticles());
+
+        return $encodedArticles ? $encodedArticles : null;
     }
 
     public function addArticlesFromUploadedFiles(array $uploadedFiles): void

@@ -17,7 +17,7 @@ class Database
 
     public static function getConnection(): PDO
     {
-        if (!isset(self::$connection)) {
+        if (!self::$connection instanceof PDO) {
             self::$connection = new PDO(
                 'mysql:dbname=challenge;host=db;port=3306',
                 'mysqluser',

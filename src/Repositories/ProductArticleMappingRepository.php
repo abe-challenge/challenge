@@ -6,7 +6,7 @@ use PDOStatement;
 
 class ProductArticleMappingRepository extends BaseRepository
 {
-    public function insert(string $productId, int $articleId, int $amountOf)
+    public function insert(string $productId, int $articleId, int $amountOf): void
     {
         $preparedStatement = $this->databaseConnection->prepare(
             'INSERT INTO `product_article_mapping` VALUES (:productId, :articleId, :amountOf)'
