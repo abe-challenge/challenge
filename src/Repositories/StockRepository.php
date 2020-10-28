@@ -24,15 +24,6 @@ class StockRepository extends BaseRepository
         $this->databaseConnection->commit();
     }
 
-    public function increase(string $productId, int $increment = 1): void
-    {
-        $this->databaseConnection->beginTransaction();
-        $sql = "UPDATE `stock` SET `stock` = `stock` + $increment WHERE product_id = :productId";
-        $preparedStatement = $this->databaseConnection->prepare($sql);
-        $preparedStatement->execute(['productId' => $productId]);
-        $this->databaseConnection->commit();
-    }
-
     public function set(string $productId, int $stock = 0): void
     {
         $this->databaseConnection->beginTransaction();
