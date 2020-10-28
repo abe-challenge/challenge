@@ -10,23 +10,8 @@ services:
       - ".:/www/challenge"
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
-
-  # worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/Dockerfile
-  #   volumes:
-  #     - "./:/www/challenge"
-  #   restart: unless-stopped
-  #   entrypoint:
-  #     - php
-  #     - bin/console
-  #     - messenger:consume
-  #     - high_prio_redis
-  #     - default_prio_redis
-  #     - transcoding_redis
-  #     - low_prio_redis
-  #     - -vv
+    env_file:
+      - .env
 
   db:
     image: mysql:${MYSQL_VERSION}
