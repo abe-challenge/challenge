@@ -15,6 +15,7 @@ class ArticleRepository extends BaseRepository
 
     public function insert(int $articleId, string $name, int $stock): void
     {
+        $this->databaseConnection->beginTransaction();
         $preparedStatement = $this->databaseConnection->prepare(
             'INSERT INTO `articles` VALUES (:articleId, :name, :stock) ON DUPLICATE KEY UPDATE `stock` = `stock` + :stock'
         );
@@ -23,6 +24,7 @@ class ArticleRepository extends BaseRepository
             'name' => $name,
             'stock' => $stock,
         ]);
+        $this->databaseConnection->commit();
     }
 
     public function get(int $articleId): PDOStatement
@@ -59,15 +61,6 @@ class ArticleRepository extends BaseRepository
     {
         $this->databaseConnection->beginTransaction();
         $sql = "UPDATE `articles` SET `stock` = `stock` - $decrement WHERE id = :articleId";
-        $preparedStatement = $this->databaseConnection->prepare($sql);
-        $preparedStatement->execute(['articleId' => $articleId]);
-        $this->databaseConnection->commit();
-    }
-
-    public function increaseStock(int $articleId, int $increment = 1): void
-    {
-        $this->databaseConnection->beginTransaction();
-        $sql = "UPDATE `articles` SET `stock` = `stock` + $increment WHERE id = :articleId";
         $preparedStatement = $this->databaseConnection->prepare($sql);
         $preparedStatement->execute(['articleId' => $articleId]);
         $this->databaseConnection->commit();
