@@ -12,13 +12,16 @@ use Symfony\Component\Messenger\MessageBus;
 
 class ArticleService
 {
+    private $stockService;
     private $articleRepository;
     private $messageBus;
 
     public function __construct(
+        StockService $stockService,
         ArticleRepository $articleRepository,
         MessageBus $messageBus
     ) {
+        $this->stockService = $stockService;
         $this->articleRepository = $articleRepository;
         $this->messageBus = $messageBus;
     }
@@ -42,11 +45,14 @@ class ArticleService
         $decodedArticles = json_decode($uploadedFile->getStream()->read($uploadedFile->getStream()->getSize()));
 
         foreach ($decodedArticles->inventory as $decodedArticle) {
+            $articleId = (int) $decodedArticle->art_id;
             $this->articleRepository->insert(
-                (int) $decodedArticle->art_id,
+                $articleId,
                 $decodedArticle->name,
                 (int) $decodedArticle->stock
             );
+
+            $this->stockService->calculateStockForArticleUpdate($articleId);
         }
     }
 
@@ -69,6 +75,7 @@ class ArticleService
 
         if (!empty($data['name']) || !empty($data['stock'])) {
             $this->articleRepository->update($articleId, $data['name'] ?? $articleDto->name, $data['stock'] ?? $articleDto->stock);
+            $this->stockService->calculateStockForArticleUpdate($articleId);
         }
 
         return $this->getArticleAsEncoded($articleId);

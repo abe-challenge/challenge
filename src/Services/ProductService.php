@@ -16,23 +16,20 @@ use Symfony\Component\Messenger\MessageBus;
 
 class ProductService
 {
+    private $stockService;
     private $productRepository;
     private $productArticleMappingRepository;
-    private $stockRepository;
-    private $articleRepository;
     private $messageBus;
 
     public function __construct(
+        StockService $stockService,
         ProductRepository $productRepository,
         ProductArticleMappingRepository $productArticleMappingRepository,
-        StockRepository $stockRepository,
-        ArticleRepository $articleRepository,
         MessageBus $messageBus
     ) {
+        $this->stockService = $stockService;
         $this->productRepository = $productRepository;
         $this->productArticleMappingRepository = $productArticleMappingRepository;
-        $this->stockRepository = $stockRepository;
-        $this->articleRepository = $articleRepository;
         $this->messageBus = $messageBus;
     }
 
@@ -61,10 +58,13 @@ class ProductService
                 $decodedProduct->name,
                 isset($decodedProduct->price) ? (int) $decodedProduct->price : rand(1, 20)
             );
+            $this->stockService->initializeProductStock($productId);
 
             foreach ($decodedProduct->contain_articles as $mapping) {
                 $this->productArticleMappingRepository->insert($productId, (int) $mapping->art_id, (int) $mapping->amount_of);
             }
+
+            $this->stockService->calculateProductStock($productId);
         }
     }
 
@@ -87,6 +87,7 @@ class ProductService
 
         if (!empty($data['name']) || !empty($data['price'])) {
             $this->productRepository->update($productId, $data['name'] ?? $productDto->name, $data['price'] ?? $productDto->price);
+            $this->stockService->calculateProductStock($productId);
         }
 
         return $this->getProductAsEncoded($productId);
@@ -112,7 +113,7 @@ class ProductService
             throw new NoStockException();
         }
 
-        $this->stockRepository->decrease($productId);
+        $this->stockService->decreaseProductStock($productId);
     }
 
     private function getProduct(string $productId): ?ProductDto
