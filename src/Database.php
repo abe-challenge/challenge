@@ -19,7 +19,7 @@ class Database
     {
         if (!self::$connection instanceof PDO) {
             self::$connection = new PDO(
-                'mysql:dbname=' . $_ENV['MYSQL_DATABASE'] . ';host=' . $_ENV['MYSQL_SERVER_NAME'] . ';port=' . $_ENV['MYSQL_PORT'],
+                'mysql:dbname='.$_ENV['MYSQL_DATABASE'].';host='.$_ENV['MYSQL_SERVER_NAME'].';port='.$_ENV['MYSQL_PORT'],
                 $_ENV['MYSQL_USER'],
                 $_ENV['MYSQL_PASSWORD']
             );
